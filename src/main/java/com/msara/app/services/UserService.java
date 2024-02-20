@@ -4,8 +4,11 @@ import com.msara.app.models.entities.RoleEntity;
 import com.msara.app.models.entities.UserEntity;
 import com.msara.app.repositories.RoleRepository;
 import com.msara.app.repositories.UserRepository;
+import com.msara.app.utils.enums.RolesEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 @Service
 public class UserService {
@@ -16,41 +19,35 @@ public class UserService {
     @Autowired
     private RoleRepository roleRepository;
 
-    public void createOwner(UserEntity userRequest) {
+    public void createClient(UserEntity userRequest) {
 
-        RoleEntity ownerRole = roleRepository.findByRoleName("owner");
+        RoleEntity clientRole = roleRepository.findByName(String.valueOf(RolesEnum.CLIENT));
 
-        if (ownerRole == null) {
-            throw new RuntimeException("Role 'owner' not found");
+        if (clientRole == null) {
+            throw new RuntimeException("Role 'CLIENT' not found");
         }
 
-        UserEntity newOwner = new UserEntity();
-        fillData(userRequest);
-        newOwner.setRole(ownerRole);
+        UserEntity newClient = UserEntity.builder()
+                .firstName(userRequest.getFirstName())
+                .lastName(userRequest.getLastName())
+                .mail(userRequest.getMail())
+                .password(userRequest.getPassword())
+                .roles(Set.of(clientRole))
+                .build();
 
-        userRepository.save(newOwner);
+        userRepository.save(newClient);
     }
 
-    public void createEmployee(UserEntity userRequest) {
+    public void assignRoleToUser(int idUser, int idRole) {
+        UserEntity userFound = userRepository.findById(idUser).orElseThrow();
+        RoleEntity roleFound = roleRepository.findById(idRole).orElseThrow();
 
-        RoleEntity employeeRole = roleRepository.findByRoleName("employee");
+        userFound.getRoles().add(roleFound);
+        roleFound.getUsers().add(userFound);
 
-        if (employeeRole == null) {
-            throw new RuntimeException("Role 'employee' not found");
-        }
-
-        UserEntity newEmployee = new UserEntity();
-        fillData(userRequest);
-        newEmployee.setRole(employeeRole);
-
-        userRepository.save(newEmployee);
+        userRepository.save(userFound);
+        roleRepository.save(roleFound);
     }
 
-    public void fillData(UserEntity userRequest) {
-        UserEntity newUser = new UserEntity();
-        newUser.setFirstName(userRequest.getFirstName());
-        newUser.setLastName(userRequest.getLastName());
-        newUser.setMail(userRequest.getMail());
-        newUser.setPassword(userRequest.getPassword());
-    }
+
 }

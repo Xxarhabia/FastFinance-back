@@ -3,6 +3,7 @@ package com.msara.app.controllers;
 import com.msara.app.models.entities.UserEntity;
 import com.msara.app.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,22 +17,22 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/owner")
-    public ResponseEntity<?> createOwner(@RequestBody UserEntity user) {
+    @PostMapping("/client")
+    public ResponseEntity<?> createClient(@RequestBody UserEntity user) {
         try {
-            userService.createOwner(user);
-            return ResponseEntity.ok().body("Owner has been created successfully");
+            userService.createClient(user);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Client has been created successfully");
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
 
-    @PostMapping("/employee")
-    public ResponseEntity<?> createEmployee(@RequestBody UserEntity user) {
+    @PostMapping("/assign-role")
+    public ResponseEntity<?> assignRole(int idUser, int idRole) {
         try {
-            userService.createEmployee(user);
-            return ResponseEntity.ok().body("Employee has been created successfully");
-        } catch (Exception e) {
+            userService.assignRoleToUser(idUser, idRole);
+            return ResponseEntity.status(HttpStatus.OK).body("Role has been assigned successfully");
+        } catch(Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
