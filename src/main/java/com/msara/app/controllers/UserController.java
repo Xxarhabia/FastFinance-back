@@ -5,6 +5,7 @@ import com.msara.app.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,8 +28,8 @@ public class UserController {
         }
     }
 
-    @PostMapping("/assign-role")
-    public ResponseEntity<?> assignRole(int idUser, int idRole) {
+    @PostMapping("/{idUser}/assign-role/{idRole}")
+    public ResponseEntity<?> assignRole(@PathVariable Integer idUser, @PathVariable Integer idRole) {
         try {
             userService.assignRoleToUser(idUser, idRole);
             return ResponseEntity.status(HttpStatus.OK).body("Role has been assigned successfully");
